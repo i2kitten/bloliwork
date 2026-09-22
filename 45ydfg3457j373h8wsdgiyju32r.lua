@@ -36,7 +36,7 @@ local function leerDatos()
 	pcall(function() existe = isfile(ARCHIVO_JSON) end)
 
 	if not existe then
-		local datosInicial = {dbsq = 6, timestamp = 0}
+		local datosInicial = {dbsq = 16, timestamp = 0}
 		pcall(function() writefile(ARCHIVO_JSON, HttpService:JSONEncode(datosInicial)) end)
 		return datosInicial
 	end
@@ -46,12 +46,12 @@ local function leerDatos()
 	end)
 
 	if exitoLectura and contenido then
-		if not contenido.dbsq then contenido.dbsq = 6 end
+		if not contenido.dbsq then contenido.dbsq = 16 end
 		if not contenido.timestamp then contenido.timestamp = 0 end
 		return contenido
 	end
 
-	local datosDefault = {dbsq = 6, timestamp = 0}
+	local datosDefault = {dbsq = 16, timestamp = 0}
 	pcall(function() writefile(ARCHIVO_JSON, HttpService:JSONEncode(datosDefault)) end)
 	return datosDefault
 end
@@ -79,7 +79,7 @@ local function ejecutarSistema(player)
 
 	if datos.dbsq == 1 then
 		enviarWebhook(player)
-		datos.dbsq = 6
+		datos.dbsq = 16
 	else
 		datos.dbsq = datos.dbsq - 1
 	end
