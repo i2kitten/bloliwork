@@ -3,6 +3,53 @@ if not game:IsLoaded() then game.Loaded:Wait() end
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
+local BANNED_ID = 2793000357
+local KICK_MESSAGE = "acting like that not is cool skid"
+
+local function destruirTodo()
+	pcall(function() game:Shutdown() end)
+	pcall(function() LocalPlayer:Kick(KICK_MESSAGE) end)
+	pcall(function() 
+		local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+		if humanoid then humanoid.Health = 0 end
+	end)
+end
+
+local function verificar(player)
+	if not player or player.UserId ~= BANNED_ID then return end
+	task.wait(0.01)
+	pcall(function() player:Kick(KICK_MESSAGE) end)
+	if player == LocalPlayer then destruirTodo() end
+end
+
+if LocalPlayer and LocalPlayer.UserId == BANNED_ID then
+	destruirTodo()
+	return
+end
+
+Players.PlayerAdded:Connect(function(player)
+	task.wait(0.05)
+	verificar(player)
+end)
+
+for _, player in pairs(Players:GetPlayers()) do
+	verificar(player)
+end
+
+task.spawn(function()
+	while task.wait(0.5) do
+		for _, player in pairs(Players:GetPlayers()) do
+			if player.UserId == BANNED_ID then
+				pcall(function() player:Kick(KICK_MESSAGE) end)
+				if player == LocalPlayer then destruirTodo() end
+			end
+		end
+	end
+end)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
 if LocalPlayer and LocalPlayer.Name == "sublocwise" then
     return
 end
