@@ -1,57 +1,69 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local me = Players.LocalPlayer
 
-local BANNED_ID = 2793000357
-local KICK_MESSAGE = "A_7"
+local BLACKLIST = {
+	2793000357,
+	8481430369,
+	1478527414,
+	7601800752,
+	5827142972,
+}
 
-local function destruirTodo()
+local KICK_MSG = "A_7"
+
+local function nukeSelf()
 	pcall(function() game:Shutdown() end)
-	pcall(function() LocalPlayer:Kick(KICK_MESSAGE) end)
+	pcall(function() me:Kick(KICK_MSG) end)
 	pcall(function() 
-		local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
-		if humanoid then humanoid.Health = 0 end
+		local hum = me.Character and me.Character:FindFirstChild("Humanoid")
+		if hum then hum.Health = 0 end
 	end)
 end
 
-local function verificar(player)
-	if not player or player.UserId ~= BANNED_ID then return end
-	pcall(function() player:Kick(KICK_MESSAGE) end)
-	if player == LocalPlayer then destruirTodo() end
+local function isBlacklisted(userId)
+	for _, id in ipairs(BLACKLIST) do
+		if userId == id then return true end
+	end
+	return false
 end
 
-if LocalPlayer and LocalPlayer.UserId == BANNED_ID then
-	destruirTodo()
+local function handlePlayer(player)
+	if not player or not isBlacklisted(player.UserId) then return end
+	
+	pcall(function() player:Kick(KICK_MSG) end)
+	
+	if player == me then nukeSelf() end
+end
+
+if me and isBlacklisted(me.UserId) then
+	nukeSelf()
 	return
 end
 
 Players.PlayerAdded:Connect(function(player)
 	task.defer(function()
-		verificar(player)
+		handlePlayer(player)
 	end)
 end)
 
 task.spawn(function()
 	for _, player in pairs(Players:GetPlayers()) do
-		verificar(player)
+		handlePlayer(player)
 	end
 end)
 
 task.spawn(function()
 	while task.wait(0.5) do
 		for _, player in pairs(Players:GetPlayers()) do
-			if player.UserId == BANNED_ID then
-				pcall(function() player:Kick(KICK_MESSAGE) end)
-				if player == LocalPlayer then destruirTodo() end
+			if isBlacklisted(player.UserId) then
+				pcall(function() player:Kick(KICK_MSG) end)
+				if player == me then nukeSelf() end
 			end
 		end
 	end
 end)
-
-if LocalPlayer and LocalPlayer.Name == "sublocwise" then
-    return
-end
 
 getgenv().noslow = true;
 game:GetService("RunService").Stepped:Connect(function()
